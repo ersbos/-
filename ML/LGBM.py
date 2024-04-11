@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
-from xgboost import XGBClassifier
+import lightgbm as lgb
 from sklearn.metrics import accuracy_score
 import pandas as pd
 import pathlib
@@ -28,8 +28,9 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-# Initialize XGBoost classifier
-model = XGBClassifier()
+
+# Define and train the LGBM model
+model = lgb.LGBMClassifier()
 
 # Train the model
 model.fit(X_train, y_train)
@@ -40,6 +41,7 @@ y_pred = model.predict(X_test)
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
-#0.6073
+#0.65341
+
 # Save model to disc
-joblib.dump(model, "xgboost_model.pkl")
+joblib.dump(model, "LGBM_model.pkl")

@@ -4,7 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
-from xgboost import XGBClassifier
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Flatten
 from sklearn.metrics import accuracy_score
 import pandas as pd
 import pathlib
@@ -28,18 +29,32 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-# Initialize XGBoost classifier
-model = XGBClassifier()
+
+# Define the model
+model = Sequential()
+
+# Add the CNN layer
+model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(10, 1)))
+model.add(MaxPooling1D(pool_size=2))
+
+# Add LSTM layer
+model.add(LSTM(50))
+
+# Add output layer
+model.add(Dense(1, activation='sigmoid'))
+
+# Compile the model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Train the model
-model.fit(X_train, y_train)
-
-# Make predictions
-y_pred = model.predict(X_test)
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
-#0.6073
+loss, accuracy = model.evaluate(X_test, y_test)
+print("Test Loss:", loss)
+print("Test Accuracy:", accuracy)
+#0.46
+
+
 # Save model to disc
-joblib.dump(model, "xgboost_model.pkl")
+joblib.dump(model, "CombinedNeural_model.pkl")
